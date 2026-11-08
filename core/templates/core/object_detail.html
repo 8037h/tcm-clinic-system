@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{{ object_title }}详情{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">RECORD DETAIL</p><h1>{{ object_title }}详情</h1></div></div>
+<section class="card detail-card"><dl class="detail-grid">
+  {% for label, value in detail_rows %}<div><dt>{{ label }}</dt><dd>{{ value|default_if_none:'—'|default:'—'|linebreaksbr }}</dd></div>{% endfor %}
+</dl></section>
+{% if section == 'doctors' %}
+<div class="related-grid">
+  <section class="card detail-card"><h2>最近排班</h2><ul class="related-list">{% for schedule in recent_schedules %}<li><a href="{% url 'schedules:detail' schedule.pk %}">{{ schedule.schedule_date|date:'Y-m-d' }} {{ schedule.start_time|time:'H:i' }}–{{ schedule.end_time|time:'H:i' }}</a> · {{ schedule.get_status_display }}</li>{% empty %}<li class="muted">暂无排班。</li>{% endfor %}</ul></section>
+  <section class="card detail-card"><h2>最近接诊</h2><ul class="related-list">{% for reception in recent_receptions %}<li><a href="{% url 'receptions:detail' reception.pk %}">{{ reception.patient_name }}</a> · {{ reception.visit_time|date:'Y-m-d H:i' }} · {{ reception.get_status_display }}</li>{% empty %}<li class="muted">暂无接诊。</li>{% endfor %}</ul></section>
+  <section class="card detail-card"><h2>当前绩效记录</h2><ul class="related-list">{% for performance in recent_performances %}<li><a href="{% url 'performances:detail' performance.pk %}">{{ performance.period_start|date:'Y-m-d' }} 至 {{ performance.period_end|date:'Y-m-d' }}</a> · {{ performance.get_status_display }}</li>{% empty %}<li class="muted">暂无绩效记录。</li>{% endfor %}</ul></section>
+</div>
+{% elif section == 'schedules' %}
+<section class="card detail-card related-section"><h2>排班名额</h2><p>最大接诊人数：{{ object.max_patients }}　当前有效接诊：{{ object.booked_patients }}　剩余名额：<strong>{{ remaining_slots }}</strong></p></section>
+<section class="card detail-card related-section"><h2>已关联的接诊记录</h2><ul class="related-list">{% for reception in linked_receptions %}<li><a href="{% url 'receptions:detail' reception.pk %}">{{ reception.patient_name }}</a> · {{ reception.visit_time|date:'Y-m-d H:i' }} · {{ reception.get_status_display }}</li>{% empty %}<li class="muted">暂无关联接诊。</li>{% endfor %}</ul></section>
+{% elif section == 'performances' %}
+<section class="card detail-card related-section"><h2>统计与审核</h2>
+  <p>有效接诊 {{ object.reception_count }} 条，已完成 {{ object.completed_count }} 条。按每例完成接诊 10 分估算，基础分建议为 {{ suggested_base_score }}；实际基础分仍由管理员填写。</p>
+  <div class="business-actions">
+    {% if can_recalculate %}<form method="post" action="{% url 'performances:recalculate' object.pk %}">{% csrf_token %}<button class="btn btn-quiet" type="submit">重新统计</button></form>{% endif %}
+    {% for action, transition in transitions.items %}<form method="post" action="{% url 'performances:action' object.pk action %}">{% csrf_token %}<button class="btn btn-primary" type="submit">{{ transition.1 }}</button></form>{% endfor %}
+  </div>
+</section>
+<section class="card detail-card related-section"><h2>附件</h2>{% if object.attachment %}<a href="{% url 'performances:attachment' object.pk %}">授权下载附件</a>{% else %}<p class="muted">暂无附件。</p>{% endif %}</section>
+<section class="card detail-card related-section"><h2>操作历史</h2><ul class="related-list">{% for item in performance_history %}<li>{{ item.created_at|date:'Y-m-d H:i:s' }} · {{ item.user.username|default:'系统' }} · {{ item.operation_type }}{% if item.description %} · {{ item.description }}{% endif %}</li>{% empty %}<li class="muted">暂无操作历史。</li>{% endfor %}</ul></section>
+{% endif %}
+<div class="detail-footer"><span></span><div class="button-group"><a class="btn btn-quiet" href="{% url list_url %}">返回列表</a>{% if section == 'performances' %}{% if can_manage_performance %}<a class="btn btn-primary" href="{% url edit_url object.pk %}">编辑</a><a class="btn btn-danger" href="{% url delete_url object.pk %}">删除</a>{% endif %}{% else %}{% if can_edit %}<a class="btn btn-primary" href="{% url edit_url object.pk %}">编辑</a>{% endif %}{% if can_delete %}<a class="btn btn-danger" href="{% url delete_url object.pk %}">删除</a>{% endif %}{% endif %}</div></div>
+{% endblock %}

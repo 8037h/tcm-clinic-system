@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}编辑接诊记录{% else %}新增接诊记录{% endif %}{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">PATIENT VISIT</p><h1>{% if is_edit %}编辑接诊记录{% else %}新增接诊记录{% endif %}</h1><p class="muted">带 * 的项目为必填。完成接诊时请填写诊断与治疗意见。</p></div></div>
+<form method="post" class="card edit-card" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+  <h2>患者与接诊信息</h2>
+  <div class="form-grid">
+    {% for field in form %}
+      {% if field.name == 'symptoms' %}</div><h2>接诊明细</h2><div class="form-grid">{% endif %}
+      <div class="field {% if field.name == 'chief_complaint' or field.name == 'symptoms' or field.name == 'diagnosis' or field.name == 'treatment' or field.name == 'prescription' or field.name == 'remark' %}full-width{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}</label>
+        {{ field }}
+        {% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}
+        {% for error in field.errors %}<div class="error-text">{{ error }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="form-actions"><button type="submit" class="btn btn-primary">保存记录</button><a class="btn btn-quiet" href="{% if is_edit %}{% url 'receptions:detail' record.pk %}{% else %}{% url 'receptions:list' %}{% endif %}">取消</a></div>
+</form>
+{% endblock %}

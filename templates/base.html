@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}首页{% endblock %} · 中医馆管理系统</title>
+  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261105">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="系统导航">
+      <div class="sidebar-inner">
+        <a class="brand" href="{% url 'dashboard' %}" aria-label="中医馆管理系统首页">
+          <span class="brand-mark" aria-hidden="true">医</span>
+          <span class="brand-copy"><strong>中医馆管理系统</strong><small>医师排班与绩效记录</small></span>
+        </a>
+        <div class="nav-caption">工作台</div>
+        <nav class="side-nav" aria-label="主导航">
+          <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><span class="nav-icon">⌂</span><span>首页概览</span></a>
+          <a class="nav-link {% if request.resolver_match.namespace == 'departments' %}active{% endif %}" href="{% url 'departments:list' %}"><span class="nav-icon">科</span><span>科室管理</span></a>
+          {% if user.is_staff or user.doctor_profile %}
+          <a class="nav-link {% if request.resolver_match.namespace == 'doctors' %}active{% endif %}" href="{% url 'doctors:list' %}"><span class="nav-icon">医</span><span>医师管理</span></a>
+          <a class="nav-link {% if request.resolver_match.namespace == 'schedules' %}active{% endif %}" href="{% url 'schedules:list' %}"><span class="nav-icon">排</span><span>出诊排班</span></a>
+          <a class="nav-link {% if request.resolver_match.namespace == 'receptions' %}active{% endif %}" href="{% url 'receptions:list' %}"><span class="nav-icon">诊</span><span>接诊记录</span></a>
+          <a class="nav-link {% if request.resolver_match.namespace == 'performances' %}active{% endif %}" href="{% url 'performances:list' %}"><span class="nav-icon">绩</span><span>绩效记录</span></a>
+          {% endif %}
+          {% if user.is_staff %}
+          <div class="nav-caption nav-caption-spaced">分析与管理</div>
+          <a class="nav-link {% if request.resolver_match.url_name == 'analysis' %}active{% endif %}" href="{% url 'analysis' %}"><span class="nav-icon">析</span><span>数据分析</span></a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'operation_log_list' %}active{% endif %}" href="{% url 'operation_log_list' %}"><span class="nav-icon">志</span><span>操作日志</span></a>
+          <a class="nav-link" href="{% url 'admin:index' %}"><span class="nav-icon">管</span><span>后台管理</span></a>
+          {% endif %}
+        </nav>
+        <div class="sidebar-foot"><span class="sidebar-foot-dot"></span> 中医馆业务管理 · 本地系统</div>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="site-header">
+        <div class="topbar-title"><span class="topbar-dot"></span> 中医馆业务工作台</div>
+        <div class="topbar-actions">
+          {% if user.is_authenticated %}
+          <span class="user-chip"><span class="user-avatar">{{ user.username|first|upper }}</span><span class="user-name">{{ user.username }}</span></span>
+          <form method="post" action="{% url 'logout' %}" class="nav-logout">{% csrf_token %}<button type="submit" class="nav-button">退出登录</button></form>
+          {% else %}
+          <a class="nav-button" href="{% url 'login' %}">登录</a>
+          {% endif %}
+        </div>
+      </header>
+      <main class="main-content">
+        {% if messages %}{% for message in messages %}<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>{% endfor %}{% endif %}
+        {% block content %}{% endblock %}
+      </main>
+      <footer class="site-footer">中医馆医师排班与绩效记录管理系统 <span>© 2026</span></footer>
+    </div>
+  </div>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

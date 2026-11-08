@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}接诊记录详情{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">RECEPTION DETAIL · #{{ record.pk }}</p><h1>{{ record.patient_name }}的接诊记录</h1><p class="muted">{{ record.visit_time|date:'Y年m月d日 H:i' }} · {{ record.department }}</p></div><span class="badge badge-large badge-{{ record.status }}">{{ record.get_status_display }}</span></div>
+<div class="detail-layout">
+  <section class="card detail-card"><h2>患者与接诊信息</h2><dl class="detail-grid">
+    <div><dt>患者姓名</dt><dd>{{ record.patient_name }}</dd></div>
+    <div><dt>患者性别</dt><dd>{{ record.get_patient_gender_display|default:'未填写' }}</dd></div>
+    <div><dt>患者年龄</dt><dd>{{ record.patient_age|default_if_none:'未填写' }}</dd></div>
+    <div><dt>患者电话</dt><dd>{{ record.patient_phone|default:'未填写' }}</dd></div>
+    <div><dt>接诊医师</dt><dd>{{ record.doctor.name }}</dd></div>
+    <div><dt>科室</dt><dd>{{ record.department }}</dd></div>
+    <div><dt>对应排班</dt><dd>{% if record.schedule %}<a href="{% url 'schedules:detail' record.schedule.pk %}">{{ record.schedule.schedule_date|date:'Y-m-d' }} {{ record.schedule.start_time|time:'H:i' }}–{{ record.schedule.end_time|time:'H:i' }}</a>{% else %}未关联排班{% endif %}</dd></div>
+    <div><dt>接诊时间</dt><dd>{{ record.visit_time|date:'Y-m-d H:i' }}</dd></div>
+    <div><dt>当前状态</dt><dd><span class="badge badge-{{ record.status }}">{{ record.get_status_display }}</span></dd></div>
+  </dl></section>
+  <section class="card detail-card"><h2>接诊明细</h2><dl class="detail-stack">
+    <div><dt>主诉</dt><dd>{{ record.chief_complaint }}</dd></div>
+    <div><dt>症状描述</dt><dd>{{ record.symptoms|default:'未填写'|linebreaksbr }}</dd></div>
+    <div><dt>诊断结果</dt><dd>{{ record.diagnosis|default:'未填写'|linebreaksbr }}</dd></div>
+    <div><dt>治疗/处理意见</dt><dd>{{ record.treatment|default:'未填写'|linebreaksbr }}</dd></div>
+    <div><dt>处方内容</dt><dd>{{ record.prescription|default:'未填写'|linebreaksbr }}</dd></div>
+    <div><dt>备注</dt><dd>{{ record.remark|default:'未填写'|linebreaksbr }}</dd></div>
+  </dl></section>
+</div>
+{% if transitions %}<section class="card detail-card related-section"><h2>接诊操作</h2><div class="business-actions">{% for action, transition in transitions.items %}<form method="post" action="{% url 'receptions:action' record.pk action %}">{% csrf_token %}<button class="btn {% if action == 'cancel' %}btn-quiet{% else %}btn-primary{% endif %}" type="submit">{{ transition.1 }}</button></form>{% endfor %}</div></section>{% endif %}
+<div class="detail-footer"><span class="muted">创建：{{ record.created_at|date:'Y-m-d H:i' }} · 更新：{{ record.updated_at|date:'Y-m-d H:i' }}</span><div class="button-group"><a class="btn btn-quiet" href="{% url 'receptions:list' %}">返回列表</a><a class="btn btn-primary" href="{% url 'receptions:edit' record.pk %}">编辑记录</a></div></div>
+{% endblock %}

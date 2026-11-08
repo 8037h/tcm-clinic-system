@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}确认删除接诊记录{% endblock %}
+{% block content %}
+<div class="confirm-wrap card"><p class="eyebrow">DELETE RECORD</p><h1>确认删除接诊记录？</h1><p>即将删除 <strong>#{{ record.pk }} · {{ record.patient_name }}</strong> 的接诊记录（{{ record.visit_time|date:'Y-m-d H:i' }}）。此操作无法撤销。</p>
+  <form method="post" class="button-group">{% csrf_token %}<a class="btn btn-quiet" href="{% url 'receptions:detail' record.pk %}">取消</a><button class="btn btn-danger" type="submit">确认删除</button></form>
+</div>
+{% endblock %}

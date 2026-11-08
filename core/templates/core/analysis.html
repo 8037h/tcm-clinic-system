@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}数据分析{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">ANALYSIS</p><h1>数据分析</h1><p class="muted">概率以全部 {{ snapshot.total }} 条接诊记录为分母，含已取消记录。{% if not snapshot.total %}当前无接诊样本，概率及每日统计量未定义。{% endif %}</p></div><div class="button-group no-print"><a class="btn btn-primary" href="{% url 'analysis_export' %}">导出统计 CSV</a><button class="btn btn-quiet" type="button" onclick="window.print()">打印</button></div></div>
+<div class="metric-grid">
+  <div class="card metric"><span>接诊总数 N</span><strong>{{ snapshot.total }}</strong></div>
+  <div class="card metric"><span>P(已完成)</span><strong>{% if snapshot.completed_probability is not None %}{{ snapshot.completed_probability|floatformat:3 }}{% else %}—{% endif %}</strong></div>
+  <div class="card metric"><span>P(已取消)</span><strong>{% if snapshot.cancelled_probability is not None %}{{ snapshot.cancelled_probability|floatformat:3 }}{% else %}—{% endif %}</strong></div>
+  <div class="card metric"><span>平均每日接诊</span><strong>{% if snapshot.daily_mean is not None %}{{ snapshot.daily_mean|floatformat:2 }}{% else %}—{% endif %}</strong></div>
+  <div class="card metric"><span>每日接诊量方差</span><strong>{% if snapshot.daily_variance is not None %}{{ snapshot.daily_variance|floatformat:2 }}{% else %}—{% endif %}</strong></div>
+  <div class="card metric"><span>每日接诊量标准差</span><strong>{% if snapshot.daily_stddev is not None %}{{ snapshot.daily_stddev|floatformat:2 }}{% else %}—{% endif %}</strong></div>
+</div>
+<p class="muted statistical-note">每日指标按最早至最晚接诊日期之间的 {{ snapshot.daily_days }} 天计算，包含无接诊日。{% if snapshot.correlation is not None %}排班次数与接诊量相关系数：{{ snapshot.correlation|floatformat:3 }}。{% endif %}</p>
+<section class="card table-card analysis-table"><div class="section-heading"><h2>各科室接诊概率与完成率</h2></div><div class="table-scroll"><table><thead><tr><th>科室</th><th>接诊数</th><th>完成数</th><th>P(科室)</th><th>P(完成｜科室)</th></tr></thead><tbody>{% for row in snapshot.department_rows %}<tr><td>{{ row.name }}</td><td>{{ row.reception_count }}</td><td>{{ row.completed_count }}</td><td>{% if row.probability is not None %}{{ row.probability|floatformat:3 }}{% else %}—{% endif %}</td><td>{% if row.completion_rate is not None %}{{ row.completion_rate|floatformat:3 }}{% else %}—{% endif %}</td></tr>{% empty %}<tr><td colspan="5" class="empty-state">暂无科室数据。</td></tr>{% endfor %}</tbody></table></div></section>
+<div class="chart-grid">
+  <section class="card chart-card"><h2>最近 7 天接诊趋势</h2><div id="chart-trend" class="chart"></div></section>
+  <section class="card chart-card"><h2>各科室接诊数量</h2><div id="chart-departments" class="chart"></div></section>
+  <section class="card chart-card"><h2>接诊状态分布</h2><div id="chart-statuses" class="chart"></div></section>
+  <section class="card chart-card"><h2>医师接诊数量排行</h2><div id="chart-doctors" class="chart"></div></section>
+  <section class="card chart-card"><h2>医师绩效排行</h2><div id="chart-performance" class="chart"></div></section>
+</div>
+{{ snapshot.charts|json_script:'chart-data' }}
+{% endblock %}
+{% block extra_scripts %}<script src="{% static 'js/echarts.min.js' %}"></script><script src="{% static 'js/charts.js' %}"></script>{% endblock %}

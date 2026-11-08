@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}首页{% endblock %}
+{% block content %}
+<div class="page-heading dashboard-hero"><div><p class="eyebrow">CLINIC WORKSPACE · 业务总览</p><h1>医师排班与绩效，一目了然</h1><p class="muted">欢迎回来，{{ user.username }}。{% if user.is_staff %}下方为当前数据库中的业务概况。{% else %}从导航中进入您可访问的业务模块。{% endif %}</p></div>{% if user.is_staff %}<a class="btn btn-quiet" href="{% url 'analysis' %}">查看数据分析 →</a>{% endif %}</div>
+{% if user.is_staff %}
+<div class="metric-grid">
+  <div class="card metric"><span>医师总数</span><strong>{{ metrics.doctors }}</strong></div>
+  <div class="card metric"><span>科室总数</span><strong>{{ metrics.departments }}</strong></div>
+  <div class="card metric"><span>今日排班</span><strong>{{ metrics.today_schedules }}</strong></div>
+  <div class="card metric"><span>今日接诊</span><strong>{{ metrics.today_receptions }}</strong></div>
+  <div class="card metric"><span>本月接诊</span><strong>{{ metrics.month_receptions }}</strong></div>
+  <div class="card metric"><span>已完成接诊</span><strong>{{ metrics.completed_receptions }}</strong></div>
+  <div class="card metric"><span>待审核绩效</span><strong>{{ metrics.pending_performances }}</strong></div>
+</div>
+<div class="chart-grid">
+  <section class="card chart-card"><h2>最近 7 天接诊趋势</h2><div id="chart-trend" class="chart"></div></section>
+  <section class="card chart-card"><h2>科室接诊数量</h2><div id="chart-departments" class="chart"></div></section>
+  <section class="card chart-card"><h2>医师绩效排行</h2><div id="chart-performance" class="chart"></div></section>
+</div>
+{{ charts|json_script:'chart-data' }}
+{% else %}
+<section class="card detail-card"><h2>业务入口</h2>
+  <p>可查看<a href="{% url 'departments:list' %}">科室信息</a>。{% if user.doctor_profile %}您还可以查看<a href="{% url 'doctors:list' %}">个人医师资料</a>、<a href="{% url 'schedules:list' %}">本人排班</a>、<a href="{% url 'receptions:list' %}">本人接诊</a>和<a href="{% url 'performances:list' %}">本人绩效</a>。{% endif %}</p>
+</section>
+{% endif %}
+{% endblock %}
+{% block extra_scripts %}{% if user.is_staff %}<script src="{% static 'js/echarts.min.js' %}"></script><script src="{% static 'js/charts.js' %}"></script>{% endif %}{% endblock %}
