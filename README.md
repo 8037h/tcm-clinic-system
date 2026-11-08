@@ -8,7 +8,12 @@
 
 ## 在线演示
 
-[打开操作日志演示页面](https://semicolon-satchel-lingo.ngrok-free.dev/operation-logs/)。登录账号请向项目负责人获取。该演示使用独立的演示数据，支持体验系统操作；演示服务运行在项目负责人的电脑上，电脑或服务关闭后链接会暂时失效。首次访问可能出现 ngrok 提示页面。
+[打开操作日志演示页面](https://semicolon-satchel-lingo.ngrok-free.dev/operation-logs/)
+
+- 演示账号：`demo_admin`
+- 演示密码：`ey1Nul747F4gH5TeMva49Q`
+
+这是公开的共享演示账号，访问者可以操作、修改或删除演示数据；请勿输入真实患者信息。演示使用独立的数据库和附件目录，运行在项目负责人的电脑上，电脑或服务关闭后链接会暂时失效。首次访问可能出现 ngrok 提示页面；如果账号被其他访客修改，请联系项目负责人。
 
 ## 一、下载项目
 

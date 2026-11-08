@@ -10,7 +10,7 @@ from django.utils.deconstruct import deconstructible
 class PrivatePerformanceStorage(FileSystemStorage):
     def __init__(self):
         # 旧附件保存在 BASE_DIR/performance，保留读取能力。
-        super().__init__(location=settings.BASE_DIR, base_url=None)
+        super().__init__(location=getattr(settings, "PERFORMANCE_STORAGE_ROOT", settings.BASE_DIR), base_url=None)
 
     def url(self, name):
         raise ValueError("绩效附件只能通过授权视图访问。")

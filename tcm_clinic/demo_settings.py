@@ -11,3 +11,4 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 DATABASES["default"]["NAME"] = BASE_DIR / "demo_public" / "db.sqlite3"
 PERFORMANCE_ATTACHMENT_ROOT = BASE_DIR / "demo_public" / "private_uploads" / "performance"
+PERFORMANCE_STORAGE_ROOT = BASE_DIR / "demo_public"
