@@ -2,6 +2,10 @@
 
 基于 Python 和 Django 的课程设计项目，包含医师、科室、出诊排班、接诊、绩效、数据分析和操作日志等功能。
 
+## 在线演示
+
+[打开操作日志演示页面](https://semicolon-satchel-lingo.ngrok-free.dev/operation-logs/)。登录账号请向项目负责人获取。该演示使用独立的演示数据，支持体验系统操作；演示服务运行在项目负责人的电脑上，电脑或服务关闭后链接会暂时失效。首次访问可能出现 ngrok 提示页面。
+
 ## 一、下载项目
 
 打开 [项目仓库](https://github.com/8037h/tcm-clinic-system)，点击绿色 **Code** 按钮，选择 **Download ZIP**，下载后解压。也可以使用 Git 克隆：
